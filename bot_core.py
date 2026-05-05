@@ -48,13 +48,14 @@ class BotCore:
         """
         print(f"Executing vietcode sequence for: {file_path}")
         # Nhấn Ctrl + Shift + L
+        time.sleep(0.68)
         pyautogui.hotkey('ctrl', 'shift', 'l')
         
         # Gõ /vietcod
         pyautogui.write('/vietcod', interval=0.01)
         
         # Nghỉ 1.0 giây
-        time.sleep(1.0)
+        time.sleep(0.68)
         
         # Nhấn Enter
         pyautogui.press('enter')
@@ -72,8 +73,7 @@ class BotCore:
 
         
         # Nghỉ 0.5 giây để IDE xử lý lệnh dán
-        time.sleep(0.5)
-        time.sleep(0.5)
+        time.sleep(0.5) 
         
         # Nhấn Enter
         pyautogui.press('enter')

@@ -1,0 +1,12 @@
+{
+  "project_name": "antigravity-auto-runner",
+  "version": "0.1.0",
+  "description": "Auto runner for Antigravity IDE plans using image recognition and Go automation.",
+  "tech_stack": {
+    "backend": "Golang",
+    "automation": "RobotGo",
+    "ui": "Wails (Svelte)",
+    "image_recognition": "RobotGo Bitmap"
+  },
+  "status": "initializing"
+}

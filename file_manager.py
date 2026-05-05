@@ -7,7 +7,7 @@ def get_markdown_files(directory):
     if not directory or not os.path.isdir(directory):
         return []
     
-    files = [f for f in os.listdir(directory) if f.endswith('.md') and os.path.isfile(os.path.join(directory, f))]
+    files = [f for f in os.listdir(directory) if f.endswith('.md') and f.lower() != 'plan.md' and os.path.isfile(os.path.join(directory, f))]
     files.sort()
     
     return files

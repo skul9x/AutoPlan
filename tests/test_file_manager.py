@@ -1,8 +1,13 @@
+import sys
 import os
+
+# Add parent directory to sys.path to allow importing from root
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import file_manager
 
 def test_file_manager():
-    test_dir = os.path.abspath("test_folder")
+    test_dir = os.path.join(os.path.dirname(__file__), "fixtures", "test_folder")
     print(f"Testing directory: {test_dir}")
     
     files = file_manager.get_markdown_files(test_dir)

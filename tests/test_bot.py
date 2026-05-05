@@ -1,10 +1,15 @@
+import sys
+import os
+
+# Add parent directory to sys.path to allow importing from root
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import patch_utils
 import pyautogui
 import time
 from bot_core import BotCore
-import os
 
-def create_test_image(path="test_icon.png"):
+def create_test_image(path=os.path.join(os.path.dirname(__file__), "fixtures", "test_icon.png")):
     """
     Tạo một file ảnh mẫu bằng cách chụp một vùng nhỏ trên màn hình.
     """
@@ -18,7 +23,7 @@ def create_test_image(path="test_icon.png"):
 
 def test_bot():
     bot = BotCore(confidence=0.9)
-    test_image = "test_icon.png"
+    test_image = os.path.join(os.path.dirname(__file__), "fixtures", "test_icon.png")
     
     # Đảm bảo file test tồn tại
     if not os.path.exists(test_image):

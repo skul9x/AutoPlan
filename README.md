@@ -1,130 +1,86 @@
-# 🚀 AutoPlan Runner (Advanced Python Edition)
+# AutoPlan - Công cụ Tự động hóa Quy trình theo Kế hoạch
 
-**AutoPlan Runner** là một công cụ tự động hóa mạnh mẽ, được thiết kế để tối ưu hóa quy trình làm việc với các kế hoạch phát triển phần mềm (Markdown plans). Công cụ này sử dụng công nghệ nhận diện hình ảnh thông minh để tương tác với IDE hoặc bất kỳ ứng dụng nào, giúp thực thi các bước trong kế hoạch một cách tự động và chính xác.
+AutoPlan là một ứng dụng Python mạnh mẽ giúp tự động hóa các tác vụ trên máy tính bằng cách đọc các tệp kế hoạch Markdown (.md) và thực hiện các thao tác chuột/bàn phím tương ứng khi phát hiện các biểu tượng mục tiêu trên màn hình.
 
----
+## 🌟 Tính năng chính
 
-## ✨ Tính năng nổi bật
-
-### 🎨 Giao diện Hiện đại & Trực quan
-- **Vibe UI**: Giao diện được thiết kế hiện đại, dễ sử dụng với các thông báo trạng thái thời gian thực.
-- **Responsive Design**: Các thành phần giao diện linh hoạt, hỗ trợ theo dõi log chi tiết ngay trên ứng dụng.
-
-### 🔍 Nhận diện Hình ảnh Thông minh
-- **OpenCV Integration**: Sử dụng thuật toán so khớp mẫu (Template Matching) để tìm kiếm các biểu tượng (nút Run, Debug, v.v.) trên màn hình với độ chính xác cao.
-- **Confidence Control**: Cho phép cấu hình độ tin cậy để tránh click nhầm các phần tử tương tự.
-
-### 🎯 Custom Scan Region (Mới)
-- **Tiết kiệm tài nguyên**: Thay vì quét toàn bộ màn hình, bạn có thể chọn một vùng cụ thể để Bot tìm kiếm Icon.
-- **Tăng tốc độ**: Giảm thời gian xử lý và tăng độ chính xác bằng cách giới hạn phạm vi tìm kiếm.
-- **Công cụ chọn vùng**: Tích hợp sẵn công cụ kéo thả để xác định tọa độ `(x, y, w, h)` một cách trực quan.
-
-### 🛡️ An toàn & Kiểm soát
-- **Emergency Stop (F9)**: Phím tắt khẩn cấp để dừng ngay lập tức mọi hoạt động của Bot.
-- **Fail-safe Corners**: Cơ chế an toàn của PyAutoGUI (di chuyển chuột vào 4 góc màn hình để ngắt kết nối).
-- **Retry Mechanism**: Tự động thử lại nếu không tìm thấy Icon, giúp ứng dụng hoạt động ổn định hơn trong môi trường UI không nhất quán.
-
-### 🤖 VietCode Workflow
-- **Lệnh tự động**: Tự động nhập lệnh `/vietcode <file_path>` sau khi click vào Icon mục tiêu.
-- **Xử lý theo hàng đợi**: Thực thi lần lượt danh sách các tệp Markdown đã chọn trong thư mục.
-
----
+- **Quét kế hoạch thông minh**: Tự động liệt kê các tệp kế hoạch trong thư mục được chọn (loại bỏ tệp cấu hình `plan.md`).
+- **Nhận diện hình ảnh**: Sử dụng thị giác máy tính để tìm kiếm icon mục tiêu trên màn hình.
+- **Tự động hóa nâng cao**: Thực hiện chuỗi lệnh `/vietcode` phức tạp bao gồm phím tắt, nhập văn bản và dán đường dẫn tệp.
+- **Vùng quét tùy chỉnh**: Cho phép người dùng giới hạn khu vực quét màn hình để tăng tốc độ và độ chính xác.
+- **Dừng khẩn cấp**: Phím nóng (mặc định F9) cho phép dừng ngay lập tức quá trình tự động hóa nếu có sự cố.
+- **Giao diện hiện đại**: GUI được thiết kế bằng Tkinter trực quan, dễ sử dụng.
+- **Bảo mật & Riêng tư**: Không lưu lại đường dẫn thư mục làm việc giữa các phiên làm việc để đảm bảo tính riêng tư.
 
 ## 🛠️ Công nghệ sử dụng
 
-- **Core**: Python 3.8+
-- **Automation**: `pyautogui`, `opencv-python`, `mss` (cho hiệu suất cao trên Linux/Windows)
-- **GUI**: `tkinter` với custom components
-- **Hotkey**: `pynput`
-- **Testing**: `pytest`
+- **Ngôn ngữ**: Python 3.x
+- **Thư viện chính**:
+  - `Tkinter`: Xây dựng giao diện đồ họa người dùng.
+  - `PyAutoGUI`: Thực hiện các thao tác di chuột, click và nhấn phím.
+  - `OpenCV-Python`: Hỗ trợ nhận diện hình ảnh với độ chính xác cao (confidence).
+  - `Pynput`: Quản lý và lắng nghe các phím nóng toàn cục.
+  - `MSS`: Chụp ảnh màn hình hiệu suất cao, tối ưu cho đa nền tảng.
+  - `Pyperclip`: Quản lý clipboard an toàn trên Linux và Windows.
 
----
-
-## 📂 Cấu trúc thư mục chi tiết
+## 📁 Cấu trúc thư mục
 
 ```text
 python_app/
-├── main.py                # Điểm khởi đầu (Entry point) của ứng dụng
-├── ui_components.py       # Các thành phần giao diện và logic UI chính
-├── engine.py              # Bộ điều phối (Orchestrator) quản lý luồng thực thi
-├── bot_core.py            # Lõi xử lý tương tác thấp (Click, Type, Scan)
-├── region_selector.py     # Công cụ chọn vùng quét màn hình bằng chuột
-├── file_manager.py        # Quản lý lọc và sắp xếp file .md
-├── hotkey.py              # Lắng nghe phím tắt toàn cục (Global Hotkeys)
-├── patch_utils.py         # Tiện ích sửa lỗi và tối ưu hóa hệ thống
-├── icon.png               # Ảnh mẫu (Template) mặc định để tìm kiếm
-├── plans/                 # Thư mục chứa các file kế hoạch (.md)
-├── tests/                 # Thư mục chứa bộ kiểm thử (Unit & Integration tests)
-└── venv/                  # Môi trường ảo (Virtual Environment)
+├── main.py            # Điểm khởi đầu của ứng dụng
+├── ui_components.py    # Quản lý giao diện người dùng Tkinter
+├── bot_core.py        # Logic lõi điều khiển chuột/bàn phím
+├── engine.py          # Bộ điều phối luồng thực thi
+├── file_manager.py     # Quản lý quét và lọc tệp .md
+├── settings_manager.py # Lưu trữ cấu hình ứng dụng
+├── hotkey.py          # Xử lý phím nóng dừng khẩn cấp
+├── region_selector.py  # Công cụ chọn vùng quét màn hình
+├── patch_utils.py     # Các bản vá tối ưu hệ thống
+└── requirements.txt    # Danh sách thư viện phụ thuộc
 ```
 
----
+## 🚀 Hướng dẫn cài đặt
 
-## ⚙️ Cài đặt & Khởi chạy
+1. **Clone repository**:
+   ```bash
+   git clone https://github.com/skul9x/AutoPlan.git
+   cd AutoPlan/python_app
+   ```
 
-### 1. Chuẩn bị môi trường
-Yêu cầu Python 3.8 trở lên. Khuyến khích sử dụng môi trường ảo:
+2. **Tạo môi trường ảo (Khuyến nghị)**:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # Linux/macOS
+   # hoặc
+   venv\Scripts\activate     # Windows
+   ```
 
-```bash
-python -m venv venv
-source venv/bin/activate  # Linux/macOS
-# venv\Scripts\activate  # Windows
-```
+3. **Cài đặt các thư viện phụ thuộc**:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-### 2. Cài đặt thư viện
-```bash
-pip install pyautogui opencv-python pynput mss pillow
-```
+## 📖 Cách sử dụng
 
-*Lưu ý: Trên Linux (Ubuntu/Debian), bạn có thể cần cài đặt thêm: `sudo apt-get install scrot xclip wl-clipboard`.*
+1. **Khởi chạy ứng dụng**:
+   ```bash
+   python main.py
+   ```
+2. **Cấu hình**:
+   - Nhấn **Browse** tại mục "MD Files Folder" để chọn thư mục chứa các tệp kế hoạch.
+   - Nhấn **Browse** tại mục "Icon Image" để chọn ảnh icon mục tiêu (ví dụ: mũi tên ➡️).
+   - (Tùy chọn) Nhấn **Select Scan Area** để chọn vùng cụ thể trên màn hình.
+3. **Thực thi**:
+   - Chọn các tệp kế hoạch bạn muốn chạy trong danh sách.
+   - Nhấn **START AUTO**. Ứng dụng sẽ chờ đợi cho đến khi icon mục tiêu xuất hiện để thực thi lệnh.
+4. **Dừng lại**:
+   - Nhấn **F9** bất kỳ lúc nào để dừng khẩn cấp quá trình tự động.
 
-### 3. Khởi chạy
-```bash
-python main.py
-```
+## ⚠️ Lưu ý bảo mật
 
----
+- Tuyệt đối không lưu trữ API Key hoặc thông tin nhạy cảm trong các tệp `.md` hoặc mã nguồn.
+- Ứng dụng đã được cấu hình để không tự động lưu lại đường dẫn thư mục làm việc để bảo vệ dữ liệu của bạn.
 
-## 📖 Hướng dẫn sử dụng chi tiết
+## 📝 Bản quyền
 
-### Bước 1: Thiết lập thư mục và Icon
-- **MD Files Folder**: Nhấn "Browse" để chọn thư mục chứa các file kế hoạch của bạn.
-- **Icon Image**: Nhấn "Browse" để chọn ảnh chụp màn hình của nút bạn muốn Bot click vào (ví dụ: nút ▷ Run trong VS Code).
-
-### Bước 2: Xác định vùng quét (Tùy chọn nhưng khuyến khích)
-- Nhấn **"Select Scan Area"**.
-- Màn hình sẽ mờ đi, hãy kéo thả chuột để chọn vùng chứa Icon mục tiêu.
-- Điều này sẽ giúp Bot tìm kiếm nhanh hơn và không bị nhiễu bởi các thành phần khác trên màn hình.
-
-### Bước 3: Bắt đầu Auto
-- Nhấn **"START AUTO"**.
-- Bot sẽ chờ 2 giây để bạn chuyển sang cửa sổ làm việc.
-- Nó sẽ quét Icon trong vùng đã chọn, click vào, và gõ lệnh thực thi cho từng file `.md`.
-
-### Bước 4: Kiểm soát và Dừng
-- Bạn có thể theo dõi tiến trình trong bảng **Log Console**.
-- Nhấn **F9** hoặc nút **STOP** để dừng bất cứ lúc nào.
-
----
-
-## 🧪 Kiểm thử (Testing)
-
-Dự án đi kèm với bộ test suite toàn diện để đảm bảo tính ổn định:
-
-```bash
-# Chạy tất cả các test
-pytest tests/
-
-# Chạy test cho logic nhận diện vùng
-pytest tests/test_region_scan.py
-```
-
----
-
-## ⚠️ Lưu ý quan trọng
-- **Độ phân giải**: Ảnh Icon phải được chụp trên cùng màn hình và cùng tỷ lệ scale mà bạn đang sử dụng.
-- **Quyền truy cập**: Trên Linux/macOS, hãy đảm bảo Terminal có quyền điều khiển chuột và bàn phím (Accessibility features).
-- **Hỗ trợ Clipboard**: Nếu gặp lỗi khi dán đường dẫn, hãy cài đặt `xclip` hoặc `wl-clipboard`.
-
----
-*Phát triển bởi Antigravity Team.*
+Copyright 2026 Nguyễn Duy Trường

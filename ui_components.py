@@ -3,6 +3,7 @@ import os
 
 from tkinter import ttk, filedialog, scrolledtext
 import file_manager
+import settings_manager
 from engine import AutomationEngine
 from hotkey import HotkeyHandler
 from region_selector import RegionSelector
@@ -114,6 +115,60 @@ class AppUI:
         self.main_frame.rowconfigure(7, weight=1)
         self.main_frame.columnconfigure(1, weight=1)
 
+        # Load and Apply Settings
+        self.load_and_apply_settings()
+
+    def load_and_apply_settings(self):
+        """Loads settings from manager and populates UI."""
+        config_path = settings_manager.get_config_file_path()
+        self.log(f"Loading configuration from: {config_path}")
+        
+        settings = settings_manager.load_settings()
+        
+        # 1. MD Folder
+        md_folder = self.validate_path(settings.get("mru_md_folder", ""))
+        if md_folder:
+            self.folder_path.delete(0, tk.END)
+            self.folder_path.insert(0, md_folder)
+            self.update_file_list(md_folder)
+            
+        # 2. Icon Path
+        icon_path = self.validate_path(settings.get("mru_icon_link", ""))
+        if icon_path:
+            self.icon_path.delete(0, tk.END)
+            self.icon_path.insert(0, icon_path)
+            
+        # 3. Scan Region
+        region = settings.get("scan_region")
+        if region and isinstance(region, (list, tuple)) and len(region) == 4:
+            self.scan_region = tuple(region)
+            self.region_label.config(text=f"Current Region: {self.scan_region}")
+
+    def validate_path(self, path):
+        """Returns the path if valid on current OS, else empty string."""
+        if not path:
+            return ""
+        
+        # Convert path to current OS style for better check (though exists() handles it mostly)
+        normalized_path = os.path.normpath(path)
+        
+        if os.path.exists(normalized_path):
+            return normalized_path
+        
+        return ""
+
+    def save_current_settings(self):
+        """Gather current state and persist to storage."""
+        data = {
+            "mru_md_folder": "",
+            "mru_icon_link": self.icon_path.get(),
+            "scan_region": self.scan_region
+        }
+        try:
+            settings_manager.save_settings(data)
+        except Exception as e:
+            self.log(f"ERROR saving settings: {e}")
+
     def create_path_selector(self, label_text, attr_name, browse_cmd, row):
         ttk.Label(self.main_frame, text=label_text).grid(row=row, column=0, sticky=tk.W, pady=5)
         
@@ -131,6 +186,7 @@ class AppUI:
             self.folder_path.insert(0, folder)
             self.log(f"Selected folder: {folder}")
             self.update_file_list(folder)
+            self.save_current_settings()
 
     def browse_file(self):
         file_path = filedialog.askopenfilename(
@@ -140,6 +196,7 @@ class AppUI:
             self.icon_path.delete(0, tk.END)
             self.icon_path.insert(0, file_path)
             self.log(f"Selected icon: {file_path}")
+            self.save_current_settings()
 
     def update_file_list(self, folder):
         """Cập nhật danh sách file trong Listbox."""
@@ -168,6 +225,7 @@ class AppUI:
             self.scan_region = region
             self.region_label.config(text=f"Current Region: {region}")
             self.log(f"Region set to: {region}")
+            self.save_current_settings()
         else:
             self.log("Region selection cancelled.")
 
@@ -176,6 +234,7 @@ class AppUI:
         self.scan_region = None
         self.region_label.config(text="Current Region: Full Screen (Default)")
         self.log("Region reset to Full Screen.")
+        self.save_current_settings()
 
     def log(self, message):
         tag = None

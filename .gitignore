@@ -22,6 +22,7 @@ wheels/
 
 # Virtual Environment
 venv/
+.venv/
 ENV/
 env/
 .env
@@ -29,6 +30,8 @@ env/
 # IDEs
 .vscode/
 .idea/
+*.swp
+*.swo
 
 # OS
 .DS_Store
@@ -39,15 +42,11 @@ Run.txt
 scratch/
 test_folder/
 test_vietcode/
+
+# Plans (Only keep .gitkeep to preserve directory structure)
 plans/*
 !plans/.gitkeep
-__pycache__
-*.pyc
-*.pyo
-*.pyd
-.venv
-venv
-env
-build
-dist
-*.spec
+
+# Application Data (Settings/Logs)
+config.json
+*.log
