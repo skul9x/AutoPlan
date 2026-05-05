@@ -42,12 +42,6 @@ Run.txt
 scratch/
 test_folder/
 test_vietcode/
-
-# Plans (Only keep .gitkeep to preserve directory structure)
-plans/*
-!plans/.gitkeep
-
-# Application Data (Settings/Logs)
 config.json
 *.log
 
@@ -55,5 +49,7 @@ config.json
 autoplan-pkg/
 *.deb
 *.spec
-dist/
-build/
+
+# KEEP .brain and plans
+!.brain/
+!plans/

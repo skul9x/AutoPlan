@@ -1,55 +1,38 @@
-# AutoPlan - Công cụ Tự động hóa Quy trình theo Kế hoạch
+# AutoPlan - Công cụ Tự động hóa Thông minh
 
-AutoPlan là một ứng dụng Python mạnh mẽ giúp tự động hóa các tác vụ trên máy tính bằng cách đọc các tệp kế hoạch Markdown (.md) và thực hiện các thao tác chuột/bàn phím tương ứng khi phát hiện các biểu tượng mục tiêu trên màn hình.
+AutoPlan là một công cụ tự động hóa mạnh mẽ được viết bằng Python, cho phép thực hiện các quy trình công việc phức tạp dựa trên các kế hoạch được định nghĩa sẵn trong các file Markdown. Dự án tích hợp khả năng nhận diện hình ảnh, tương tác giao diện và hệ thống báo thức thông minh để tối ưu hóa năng suất làm việc.
 
 ## 🌟 Tính năng chính
 
-- **Quét kế hoạch thông minh**: Tự động liệt kê các tệp kế hoạch trong thư mục được chọn (loại bỏ tệp cấu hình `plan.md`).
-- **Nhận diện hình ảnh**: Sử dụng thị giác máy tính để tìm kiếm icon mục tiêu trên màn hình.
-- **Tự động hóa nâng cao**: Thực hiện chuỗi lệnh `/vietcode` phức tạp bao gồm phím tắt, nhập văn bản và dán đường dẫn tệp.
-- **Vùng quét tùy chỉnh**: Cho phép người dùng giới hạn khu vực quét màn hình để tăng tốc độ và độ chính xác.
-- **Dừng khẩn cấp**: Phím nóng (mặc định F9) cho phép dừng ngay lập tức quá trình tự động hóa nếu có sự cố.
-- **Giao diện hiện đại**: GUI được thiết kế bằng Tkinter trực quan, dễ sử dụng.
-- **Bảo mật & Riêng tư**: Không lưu lại đường dẫn thư mục làm việc giữa các phiên làm việc để đảm bảo tính riêng tư.
+- **Thực thi theo kế hoạch**: Chạy các bước tự động hóa dựa trên file Markdown.
+- **Nhận diện hình ảnh**: Sử dụng OpenCV để tìm kiếm và tương tác với các thành phần trên màn hình.
+- **Hệ thống báo thức (Stealth Alarm)**: Phát nhạc MP3 lặp lại khi hoàn thành công việc, dừng bằng phím nóng (F12).
+- **Quản lý cấu hình**: Tự động lưu và tải các thiết lập người dùng (vùng quét, file báo thức, đường dẫn kế hoạch).
+- **Giao diện thân thiện**: Xây dựng trên nền tảng Tkinter, dễ dàng điều chỉnh và theo dõi trạng thái.
 
 ## 🛠️ Công nghệ sử dụng
 
-- **Ngôn ngữ**: Python 3.x
-- **Thư viện chính**:
-  - `Tkinter`: Xây dựng giao diện đồ họa người dùng.
-  - `PyAutoGUI`: Thực hiện các thao tác di chuột, click và nhấn phím.
-  - `OpenCV-Python`: Hỗ trợ nhận diện hình ảnh với độ chính xác cao (confidence).
-  - `Pynput`: Quản lý và lắng nghe các phím nóng toàn cục.
-  - `MSS`: Chụp ảnh màn hình hiệu suất cao, tối ưu cho đa nền tảng.
-  - `Pyperclip`: Quản lý clipboard an toàn trên Linux và Windows.
+- **Ngôn ngữ chính**: Python 3.x
+- **Giao diện (UI)**: `tkinter`
+- **Tự động hóa & Tương tác**: `pyautogui`, `pynput`
+- **Xử lý hình ảnh**: `opencv-python` (cv2), `mss`, `PIL` (Pillow)
+- **Âm thanh**: `pygame`
+- **Quản lý dữ liệu**: `json`, `os`, `shutil` (Atomic saving)
 
-## 📁 Cấu trúc thư mục
+## 📂 Cấu trúc dự án
 
 ```text
 python_app/
-├── main.py            # Điểm khởi đầu của ứng dụng
-├── ui_components.py    # Quản lý giao diện người dùng Tkinter
-├── bot_core.py        # Logic lõi điều khiển chuột/bàn phím
-├── engine.py          # Bộ điều phối luồng thực thi
-├── file_manager.py     # Quản lý quét và lọc tệp .md
-├── settings_manager.py # Lưu trữ cấu hình ứng dụng
-├── hotkey.py          # Xử lý phím nóng dừng khẩn cấp
-├── region_selector.py  # Công cụ chọn vùng quét màn hình
-├── patch_utils.py     # Các bản vá tối ưu hệ thống
-├── donggoi.sh         # Script tự động đóng gói cho Linux (.deb)
-├── donggoi.txt        # Hướng dẫn đóng gói cho Windows (.exe)
-├── donggoi-linux.txt  # Hướng dẫn đóng gói chi tiết cho Linux
-└── requirements.txt    # Danh sách thư viện phụ thuộc
+├── main.py              # Điểm khởi đầu của ứng dụng
+├── engine.py            # Logic cốt lõi thực thi các bước tự động hóa
+├── ui_components.py     # Thành phần giao diện người dùng (Dashboard)
+├── alarm_manager.py     # Quản lý âm thanh báo thức và phím nóng F12
+├── settings_manager.py  # Lưu trữ và tải cấu hình người dùng (config.json)
+├── file_manager.py      # Tiện ích quản lý file và thư mục kế hoạch
+├── plans/               # Thư mục chứa các file kế hoạch (.md)
+├── .brain/              # Lưu trữ kiến thức và bộ nhớ của hệ thống
+└── requirements.txt     # Danh sách các thư viện cần thiết
 ```
-
-## 📦 Đóng gói ứng dụng
-
-Dự án đã bao gồm các công cụ để bạn có thể tự đóng gói ứng dụng thành file cài đặt:
-
-- **Windows (.exe)**: Xem hướng dẫn tại [donggoi.txt](donggoi.txt).
-- **Linux/Ubuntu (.deb)**: 
-  - Cách nhanh nhất: Chạy `./donggoi.sh` để tự động tạo file `.deb`.
-  - Xem chi tiết từng bước tại [donggoi-linux.txt](donggoi-linux.txt).
 
 ## 🚀 Hướng dẫn cài đặt
 
@@ -59,40 +42,29 @@ Dự án đã bao gồm các công cụ để bạn có thể tự đóng gói �
    cd AutoPlan/python_app
    ```
 
-2. **Tạo môi trường ảo (Khuyến nghị)**:
+2. **Tạo môi trường ảo và cài đặt thư viện**:
    ```bash
-   python -m venv venv
+   python3 -m venv venv
    source venv/bin/activate  # Linux/macOS
-   # hoặc
-   venv\Scripts\activate     # Windows
+   # Hoặc venv\Scripts\activate  # Windows
+   pip install -r requirements.txt
    ```
 
-3. **Cài đặt các thư viện phụ thuộc**:
+3. **Yêu cầu hệ thống (Linux)**:
+   Nếu bạn sử dụng Linux, hãy đảm bảo đã cài đặt các thư viện cần thiết cho Tkinter và X11:
    ```bash
-   pip install -r requirements.txt
+   sudo apt-get install python3-tk scrot
    ```
 
 ## 📖 Cách sử dụng
 
-1. **Khởi chạy ứng dụng**:
-   ```bash
-   python main.py
-   ```
-2. **Cấu hình**:
-   - Nhấn **Browse** tại mục "MD Files Folder" để chọn thư mục chứa các tệp kế hoạch.
-   - Nhấn **Browse** tại mục "Icon Image" để chọn ảnh icon mục tiêu (ví dụ: mũi tên ➡️).
-   - (Tùy chọn) Nhấn **Select Scan Area** để chọn vùng cụ thể trên màn hình.
-3. **Thực thi**:
-   - Chọn các tệp kế hoạch bạn muốn chạy trong danh sách.
-   - Nhấn **START AUTO**. Ứng dụng sẽ chờ đợi cho đến khi icon mục tiêu xuất hiện để thực thi lệnh.
-4. **Dừng lại**:
-   - Nhấn **F9** bất kỳ lúc nào để dừng khẩn cấp quá trình tự động.
+1. Chạy ứng dụng: `python main.py`
+2. Chọn thư mục chứa các file kế hoạch Markdown.
+3. Cấu hình vùng quét màn hình (Scan Region) và Icon cần tìm kiếm.
+4. (Tùy chọn) Bật chế độ Báo thức và chọn file MP3.
+5. Nhấn **Start** để bắt đầu quy trình tự động hóa.
+6. Khi báo thức kêu, nhấn **F12** để dừng nhạc.
 
-## ⚠️ Lưu ý bảo mật
-
-- Tuyệt đối không lưu trữ API Key hoặc thông tin nhạy cảm trong các tệp `.md` hoặc mã nguồn.
-- Ứng dụng đã được cấu hình để không tự động lưu lại đường dẫn thư mục làm việc để bảo vệ dữ liệu của bạn.
-
-## 📝 Bản quyền
+## ⚖️ Bản quyền
 
 Copyright 2026 Nguyễn Duy Trường

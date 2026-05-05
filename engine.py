@@ -2,32 +2,41 @@ import threading
 import time
 import os
 from bot_core import BotCore
+from alarm_manager import AlarmManager
+
 
 class AutomationEngine:
     def __init__(self, log_callback, on_finished_callback):
         self.log_callback = log_callback
         self.on_finished_callback = on_finished_callback
         self.bot = BotCore()
+        self.alarm = AlarmManager(stop_callback=self._on_alarm_stop)
         self.is_running = False
         self.thread = None
 
-    def start(self, folder_path, md_files, icon_path, region=None):
+    def _on_alarm_stop(self):
+        self.log_callback("Báo thức đã dừng (F12).")
+        self.is_running = False
+        self.on_finished_callback()
+
+    def start(self, folder_path, md_files, icon_path, region=None, alarm_enabled=False, alarm_path=""):
         if self.is_running:
             return
         
         self.is_running = True
         self.thread = threading.Thread(
             target=self._run_loop, 
-            args=(folder_path, md_files, icon_path, region),
+            args=(folder_path, md_files, icon_path, region, alarm_enabled, alarm_path),
             daemon=True
         )
         self.thread.start()
 
     def stop(self):
         self.is_running = False
+        self.alarm.stop_alarm()
         self.log_callback("Dừng bot theo yêu cầu người dùng.")
 
-    def _run_loop(self, folder_path, md_files, icon_path, region):
+    def _run_loop(self, folder_path, md_files, icon_path, region, alarm_enabled, alarm_path):
         try:
             self.log_callback("Bot sẽ bắt đầu sau 2 giây. Vui lòng chuyển sang cửa sổ đích...")
             time.sleep(2)
@@ -69,6 +78,12 @@ class AutomationEngine:
 
             if self.is_running:
                 self.log_callback("Hoàn thành xử lý tất cả các file.")
+                if alarm_enabled and alarm_path:
+                    self.log_callback("Đang kích hoạt báo thức... (Nhấn F12 để dừng)")
+                    self.alarm.start_alarm(alarm_path)
+                    # Giữ thread sống cho đến khi báo thức dừng hoặc bot bị dừng
+                    while self.is_running and self.alarm.is_playing:
+                        time.sleep(0.5)
             else:
                 self.log_callback("Bot đã dừng lại.")
                 

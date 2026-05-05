@@ -26,6 +26,9 @@ class AppUI:
         # Region state
         self.scan_region = None
         
+        # Alarm state
+        self.alarm_enabled = tk.BooleanVar(value=False)
+        
         # Main Container
         self.main_frame = ttk.Frame(root, padding="20")
         self.main_frame.pack(fill=tk.BOTH, expand=True)
@@ -80,10 +83,28 @@ class AppUI:
         
         ttk.Button(region_frame, text="Select Scan Area", command=self.on_select_region).pack(side=tk.LEFT, padx=5)
         ttk.Button(region_frame, text="Reset", command=self.on_reset_region).pack(side=tk.LEFT, padx=5)
+        
+        # Alarm Settings
+        alarm_frame = ttk.LabelFrame(self.main_frame, text="Alarm Settings (Completion)", padding=10)
+        alarm_frame.grid(row=5, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=10)
+        
+        ttk.Checkbutton(
+            alarm_frame, 
+            text="Enable Alarm on Finish", 
+            variable=self.alarm_enabled,
+            command=self.save_current_settings
+        ).grid(row=0, column=0, sticky=tk.W, padx=5)
+        
+        ttk.Label(alarm_frame, text="MP3 File:").grid(row=1, column=0, sticky=tk.W, padx=5, pady=5)
+        
+        self.alarm_path_entry = ttk.Entry(alarm_frame, width=40)
+        self.alarm_path_entry.grid(row=1, column=1, sticky=(tk.W, tk.E), padx=5)
+        
+        ttk.Button(alarm_frame, text="Browse MP3", command=self.browse_mp3).grid(row=1, column=2, padx=5)
 
         # Control Buttons
         self.btn_frame = ttk.Frame(self.main_frame)
-        self.btn_frame.grid(row=5, column=0, columnspan=3, pady=10)
+        self.btn_frame.grid(row=6, column=0, columnspan=3, pady=10)
         
         self.start_btn = ttk.Button(
             self.btn_frame, 
@@ -101,18 +122,18 @@ class AppUI:
         self.stop_btn.pack(side=tk.LEFT, padx=10)
         
         # Log Area
-        ttk.Label(self.main_frame, text="Log Output:").grid(row=6, column=0, sticky=tk.W)
+        ttk.Label(self.main_frame, text="Log Output:").grid(row=7, column=0, sticky=tk.W)
         self.log_area = scrolledtext.ScrolledText(
             self.main_frame, 
-            height=10, 
+            height=8, 
             wrap=tk.WORD,
             bg="black",
             fg="#00ff00", # Matrix green
             font=("Consolas", 10)
         )
-        self.log_area.grid(row=7, column=0, columnspan=3, sticky=(tk.W, tk.E, tk.N, tk.S), pady=5)
+        self.log_area.grid(row=8, column=0, columnspan=3, sticky=(tk.W, tk.E, tk.N, tk.S), pady=5)
         self.log_area.tag_config("error", foreground="red")
-        self.main_frame.rowconfigure(7, weight=1)
+        self.main_frame.rowconfigure(8, weight=1)
         self.main_frame.columnconfigure(1, weight=1)
 
         # Load and Apply Settings
@@ -144,6 +165,13 @@ class AppUI:
             self.scan_region = tuple(region)
             self.region_label.config(text=f"Current Region: {self.scan_region}")
 
+        # 4. Alarm Settings
+        self.alarm_enabled.set(settings.get("alarm_enabled", False))
+        alarm_mp3 = self.validate_path(settings.get("alarm_mp3_path", ""))
+        if alarm_mp3:
+            self.alarm_path_entry.delete(0, tk.END)
+            self.alarm_path_entry.insert(0, alarm_mp3)
+
     def validate_path(self, path):
         """Returns the path if valid on current OS, else empty string."""
         if not path:
@@ -160,9 +188,11 @@ class AppUI:
     def save_current_settings(self):
         """Gather current state and persist to storage."""
         data = {
-            "mru_md_folder": "",
+            "mru_md_folder": self.folder_path.get(),
             "mru_icon_link": self.icon_path.get(),
-            "scan_region": self.scan_region
+            "scan_region": self.scan_region,
+            "alarm_enabled": self.alarm_enabled.get(),
+            "alarm_mp3_path": self.alarm_path_entry.get()
         }
         try:
             settings_manager.save_settings(data)
@@ -196,6 +226,16 @@ class AppUI:
             self.icon_path.delete(0, tk.END)
             self.icon_path.insert(0, file_path)
             self.log(f"Selected icon: {file_path}")
+            self.save_current_settings()
+
+    def browse_mp3(self):
+        file_path = filedialog.askopenfilename(
+            filetypes=[("MP3 files", "*.mp3"), ("All files", "*.*")]
+        )
+        if file_path:
+            self.alarm_path_entry.delete(0, tk.END)
+            self.alarm_path_entry.insert(0, file_path)
+            self.log(f"Selected alarm MP3: {file_path}")
             self.save_current_settings()
 
     def update_file_list(self, folder):

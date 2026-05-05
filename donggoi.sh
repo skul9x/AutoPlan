@@ -35,10 +35,29 @@ echo "🏗️ Đang tạo cấu trúc gói Debian..."
 rm -rf autoplan-pkg # Xóa bản cũ nếu có
 mkdir -p autoplan-pkg/usr/bin
 mkdir -p autoplan-pkg/DEBIAN
+mkdir -p autoplan-pkg/usr/share/applications
+mkdir -p autoplan-pkg/usr/share/icons/hicolor/scalable/apps
 
 # Copy binary vào thư mục bin của hệ thống
 cp dist/autoplan autoplan-pkg/usr/bin/
 chmod +x autoplan-pkg/usr/bin/autoplan
+
+# Copy icon
+if [ -f "icon.png" ]; then
+    cp icon.png autoplan-pkg/usr/share/icons/hicolor/scalable/apps/autoplan.png
+fi
+
+# Tạo file .desktop để hiện thị trong menu ứng dụng
+cat <<EOF > autoplan-pkg/usr/share/applications/autoplan.desktop
+[Desktop Entry]
+Name=AutoPlan
+Comment=AutoPlan Python Automation Tool
+Exec=autoplan
+Icon=autoplan
+Terminal=false
+Type=Application
+Categories=Utility;Automation;
+EOF
 
 # Tạo file control
 printf "Package: autoplan\nVersion: 1.0.0\nSection: utils\nPriority: optional\nArchitecture: amd64\nMaintainer: Nguyen Duy Truong <skul9x@gmail.com>\nDescription: AutoPlan Python Automation Tool\n" > autoplan-pkg/DEBIAN/control
@@ -50,6 +69,8 @@ dpkg-deb --build autoplan-pkg
 echo "------------------------------------------------"
 echo "✅ Đã đóng gói xong: autoplan-pkg.deb"
 echo "------------------------------------------------"
-echo "Để cài đặt, hãy chạy lệnh sau:"
-echo "sudo dpkg -i autoplan-pkg.deb"
+echo "🛠️ Đang tự động cài đặt gói .deb..."
+echo "1" | sudo -S dpkg -i autoplan-pkg.deb
+echo "------------------------------------------------"
+echo "🎉 Hoàn tất! Bạn có thể chạy AutoPlan từ menu ứng dụng."
 echo "------------------------------------------------"

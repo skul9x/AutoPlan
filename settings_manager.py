@@ -7,7 +7,9 @@ APP_NAME = "autoplan"
 DEFAULT_SETTINGS = {
     "mru_md_folder": "",
     "mru_icon_link": "",
-    "scan_region": None
+    "scan_region": None,
+    "alarm_enabled": False,
+    "alarm_mp3_path": ""
 }
 
 def get_config_dir():
@@ -78,6 +80,13 @@ def load_settings():
             # Merge with defaults to ensure all keys are present
             settings = DEFAULT_SETTINGS.copy()
             settings.update(loaded_data)
+            
+            # Default mru_md_folder to Desktop if empty
+            if not settings.get("mru_md_folder"):
+                settings["mru_md_folder"] = str(pathlib.Path.home() / "Desktop")
+                
             return settings
     except (json.JSONDecodeError, IOError):
-        return DEFAULT_SETTINGS.copy()
+        settings = DEFAULT_SETTINGS.copy()
+        settings["mru_md_folder"] = str(pathlib.Path.home() / "Desktop")
+        return settings
