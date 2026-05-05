@@ -19,14 +19,14 @@ class AutomationEngine:
         self.is_running = False
         self.on_finished_callback()
 
-    def start(self, folder_path, md_files, icon_path, region=None, alarm_enabled=False, alarm_path=""):
+    def start(self, folder_path, md_files, icon_path, region=None, error_icon_path=None, alarm_enabled=False, alarm_path=""):
         if self.is_running:
             return
         
         self.is_running = True
         self.thread = threading.Thread(
             target=self._run_loop, 
-            args=(folder_path, md_files, icon_path, region, alarm_enabled, alarm_path),
+            args=(folder_path, md_files, icon_path, region, error_icon_path, alarm_enabled, alarm_path),
             daemon=True
         )
         self.thread.start()
@@ -36,7 +36,7 @@ class AutomationEngine:
         self.alarm.stop_alarm()
         self.log_callback("Dừng bot theo yêu cầu người dùng.")
 
-    def _run_loop(self, folder_path, md_files, icon_path, region, alarm_enabled, alarm_path):
+    def _run_loop(self, folder_path, md_files, icon_path, region, error_icon_path, alarm_enabled, alarm_path):
         try:
             self.log_callback("Bot sẽ bắt đầu sau 2 giây. Vui lòng chuyển sang cửa sổ đích...")
             time.sleep(2)
@@ -48,13 +48,22 @@ class AutomationEngine:
                 abs_path = os.path.join(folder_path, file_name)
                 
                 region_info = f" trong vùng {region}" if region else ""
-                self.log_callback(f"Đang chờ icon hiển thị{region_info} để xử lý: {file_name}")
+                error_info = " (có kiểm tra ảnh lỗi)" if error_icon_path else ""
+                self.log_callback(f"Đang chờ icon hiển thị{region_info}{error_info} để xử lý: {file_name}")
                 
-                # Bước 1: Đợi cho đến khi thấy Icon
+                # Bước 1: Đợi icon với logic quét 2 ảnh
                 while self.is_running:
+                    # 1a. Nếu có ảnh lỗi → kiểm tra trước
+                    if error_icon_path and self.bot.is_icon_visible(error_icon_path, region=region):
+                        self.log_callback("⚠️ Phát hiện ảnh lỗi! Quét lại ngay...")
+                        time.sleep(0.1)
+                        continue  # Quay lại đầu vòng lặp, KHÔNG quét ảnh bình thường
+                    
+                    # 1b. Không thấy ảnh lỗi (hoặc không có ảnh lỗi) → quét ảnh bình thường
                     if self.bot.is_icon_visible(icon_path, region=region):
-                        break
-                    time.sleep(0.1) # Quét nhanh hơn trong test hoặc thực tế nếu cần, mặc định 0.1s cho mượt
+                        break  # Thoát vòng lặp → bắt đầu flow làm việc
+                    
+                    time.sleep(0.1)
                 
                 if not self.is_running:
                     break

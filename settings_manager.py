@@ -6,6 +6,7 @@ import platform
 APP_NAME = "autoplan"
 DEFAULT_SETTINGS = {
     "mru_md_folder": "",
+    "error_icon_path": "",
     "mru_icon_link": "",
     "scan_region": None,
     "alarm_enabled": False,

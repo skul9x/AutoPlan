@@ -13,8 +13,9 @@ class AppUI:
     def __init__(self, root):
         self.root = root
         self.root.title("AutoPlan Runner - Python Edition")
-        self.root.geometry("650x650")
+        self.root.geometry("650x750")
         self.root.configure(bg="#f0f0f0")
+        
         
         # Engine setup
         self.engine = AutomationEngine(self.safe_log, self.on_engine_finished)
@@ -41,19 +42,27 @@ class AppUI:
             0
         )
         
-        # Icon selection
+        # Error icon selection (Ảnh lỗi - Ảnh điều kiện)
         self.create_path_selector(
-            "Icon Image (➡️):", 
-            "icon_path", 
-            self.browse_file, 
+            "Ảnh lỗi (⚠️):", 
+            "error_icon_path", 
+            self.browse_error_icon, 
             1
         )
         
+        # Normal icon selection (Ảnh bình thường - trigger flow)
+        self.create_path_selector(
+            "Ảnh bình thường (➡️):", 
+            "icon_path", 
+            self.browse_file, 
+            2
+        )
+        
         # File Selection Listbox
-        ttk.Label(self.main_frame, text="Select Files to Execute:").grid(row=2, column=0, sticky=tk.W, pady=(10, 0))
+        ttk.Label(self.main_frame, text="Select Files to Execute:").grid(row=3, column=0, sticky=tk.W, pady=(10, 0))
         
         list_frame = ttk.Frame(self.main_frame)
-        list_frame.grid(row=3, column=0, columnspan=2, sticky=(tk.W, tk.E, tk.N, tk.S), pady=5)
+        list_frame.grid(row=4, column=0, columnspan=2, sticky=(tk.W, tk.E, tk.N, tk.S), pady=5)
         
         self.file_listbox = tk.Listbox(
             list_frame, 
@@ -69,14 +78,14 @@ class AppUI:
         
         # List Buttons Frame
         list_btn_frame = ttk.Frame(self.main_frame)
-        list_btn_frame.grid(row=3, column=2, sticky=tk.N, padx=5, pady=5)
+        list_btn_frame.grid(row=4, column=2, sticky=tk.N, padx=5, pady=5)
         
         ttk.Button(list_btn_frame, text="Select All", command=self.select_all).pack(fill=tk.X, pady=2)
         ttk.Button(list_btn_frame, text="Deselect All", command=self.deselect_all).pack(fill=tk.X, pady=2)
         
         # Region Selection
         region_frame = ttk.LabelFrame(self.main_frame, text="Scan Region Management", padding=10)
-        region_frame.grid(row=4, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=10)
+        region_frame.grid(row=5, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=10)
         
         self.region_label = ttk.Label(region_frame, text="Current Region: Full Screen (Default)")
         self.region_label.pack(side=tk.LEFT, padx=5)
@@ -86,7 +95,7 @@ class AppUI:
         
         # Alarm Settings
         alarm_frame = ttk.LabelFrame(self.main_frame, text="Alarm Settings (Completion)", padding=10)
-        alarm_frame.grid(row=5, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=10)
+        alarm_frame.grid(row=6, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=10)
         
         ttk.Checkbutton(
             alarm_frame, 
@@ -104,7 +113,7 @@ class AppUI:
 
         # Control Buttons
         self.btn_frame = ttk.Frame(self.main_frame)
-        self.btn_frame.grid(row=6, column=0, columnspan=3, pady=10)
+        self.btn_frame.grid(row=7, column=0, columnspan=3, pady=10)
         
         self.start_btn = ttk.Button(
             self.btn_frame, 
@@ -122,22 +131,34 @@ class AppUI:
         self.stop_btn.pack(side=tk.LEFT, padx=10)
         
         # Log Area
-        ttk.Label(self.main_frame, text="Log Output:").grid(row=7, column=0, sticky=tk.W)
+        ttk.Label(self.main_frame, text="Log Output:").grid(row=8, column=0, sticky=tk.W)
         self.log_area = scrolledtext.ScrolledText(
             self.main_frame, 
-            height=8, 
+            height=15, 
             wrap=tk.WORD,
             bg="black",
             fg="#00ff00", # Matrix green
             font=("Consolas", 10)
         )
-        self.log_area.grid(row=8, column=0, columnspan=3, sticky=(tk.W, tk.E, tk.N, tk.S), pady=5)
+        self.log_area.grid(row=9, column=0, columnspan=3, sticky=(tk.W, tk.E, tk.N, tk.S), pady=5)
         self.log_area.tag_config("error", foreground="red")
-        self.main_frame.rowconfigure(8, weight=1)
+        self.main_frame.rowconfigure(9, weight=1)
         self.main_frame.columnconfigure(1, weight=1)
 
         # Load and Apply Settings
         self.load_and_apply_settings()
+
+        # Center window on screen
+        self.center_window(650, 750)
+
+    def center_window(self, width=650, height=750):
+        """Center the window on screen."""
+        self.root.update_idletasks()  # Ensure geometry is calculated
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+        x = (screen_width // 2) - (width // 2)
+        y = (screen_height // 2) - (height // 2)
+        self.root.geometry(f"{width}x{height}+{x}+{y}")
 
     def load_and_apply_settings(self):
         """Loads settings from manager and populates UI."""
@@ -152,6 +173,12 @@ class AppUI:
             self.folder_path.delete(0, tk.END)
             self.folder_path.insert(0, md_folder)
             self.update_file_list(md_folder)
+            
+        # 1.5. Error Icon Path
+        error_icon = self.validate_path(settings.get("error_icon_path", ""))
+        if error_icon:
+            self.error_icon_path.delete(0, tk.END)
+            self.error_icon_path.insert(0, error_icon)
             
         # 2. Icon Path
         icon_path = self.validate_path(settings.get("mru_icon_link", ""))
@@ -189,6 +216,7 @@ class AppUI:
         """Gather current state and persist to storage."""
         data = {
             "mru_md_folder": self.folder_path.get(),
+            "error_icon_path": self.error_icon_path.get(),
             "mru_icon_link": self.icon_path.get(),
             "scan_region": self.scan_region,
             "alarm_enabled": self.alarm_enabled.get(),
@@ -226,6 +254,16 @@ class AppUI:
             self.icon_path.delete(0, tk.END)
             self.icon_path.insert(0, file_path)
             self.log(f"Selected icon: {file_path}")
+            self.save_current_settings()
+
+    def browse_error_icon(self):
+        file_path = filedialog.askopenfilename(
+            filetypes=[("Image files", "*.png *.jpg *.jpeg *.bmp"), ("All files", "*.*")]
+        )
+        if file_path:
+            self.error_icon_path.delete(0, tk.END)
+            self.error_icon_path.insert(0, file_path)
+            self.log(f"Selected error icon: {file_path}")
             self.save_current_settings()
 
     def browse_mp3(self):
@@ -326,7 +364,23 @@ class AppUI:
         self.log(f"Đã chọn {len(selected_files)} file kế hoạch. Bắt đầu chạy...")
         
         # 4. Truyền danh sách file đã chọn và vùng quét vào engine.start
-        self.engine.start(folder, selected_files, icon, region=self.scan_region)
+        error_icon = self.error_icon_path.get()
+        alarm_mp3 = self.alarm_path_entry.get()
+        
+        self.engine.start(
+            folder, selected_files, icon, 
+            region=self.scan_region,
+            error_icon_path=error_icon if error_icon and os.path.exists(error_icon) else None,
+            alarm_enabled=self.alarm_enabled.get(),
+            alarm_path=alarm_mp3 if alarm_mp3 and os.path.exists(alarm_mp3) else ""
+        )
+
+        # Log báo thức
+        if self.alarm_enabled.get():
+            if alarm_mp3 and os.path.exists(alarm_mp3):
+                self.log(f"🔔 Alarm enabled. File: {os.path.basename(alarm_mp3)}")
+            else:
+                self.log("⚠️ Alarm bật nhưng chưa chọn file MP3 hợp lệ!")
 
     def on_stop(self):
         self.engine.stop()
