@@ -36,8 +36,20 @@ python_app/
 ├── hotkey.py          # Xử lý phím nóng dừng khẩn cấp
 ├── region_selector.py  # Công cụ chọn vùng quét màn hình
 ├── patch_utils.py     # Các bản vá tối ưu hệ thống
+├── donggoi.sh         # Script tự động đóng gói cho Linux (.deb)
+├── donggoi.txt        # Hướng dẫn đóng gói cho Windows (.exe)
+├── donggoi-linux.txt  # Hướng dẫn đóng gói chi tiết cho Linux
 └── requirements.txt    # Danh sách thư viện phụ thuộc
 ```
+
+## 📦 Đóng gói ứng dụng
+
+Dự án đã bao gồm các công cụ để bạn có thể tự đóng gói ứng dụng thành file cài đặt:
+
+- **Windows (.exe)**: Xem hướng dẫn tại [donggoi.txt](donggoi.txt).
+- **Linux/Ubuntu (.deb)**: 
+  - Cách nhanh nhất: Chạy `./donggoi.sh` để tự động tạo file `.deb`.
+  - Xem chi tiết từng bước tại [donggoi-linux.txt](donggoi-linux.txt).
 
 ## 🚀 Hướng dẫn cài đặt
 

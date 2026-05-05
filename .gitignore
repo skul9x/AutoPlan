@@ -50,3 +50,10 @@ plans/*
 # Application Data (Settings/Logs)
 config.json
 *.log
+
+# Packaging artifacts
+autoplan-pkg/
+*.deb
+*.spec
+dist/
+build/

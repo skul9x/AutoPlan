@@ -1,0 +1,39 @@
+HƯỚNG DẪN ĐÓNG GÓI VÀ CÀI ĐẶT .DEB CHO UBUNTU/LINUX
+================================================
+
+1. Kích hoạt môi trường ảo (venv):
+   source venv/bin/activate
+
+2. Cài đặt các thư viện cần thiết trong venv:
+   pip install -r requirements.txt
+   pip install pyinstaller
+
+3. Đóng gói mã nguồn thành file thực thi (Binary):
+   pyinstaller --noconsole --onefile --name "autoplan" main.py
+
+4. Thoát khỏi môi trường ảo (sau khi đóng gói xong):
+   deactivate
+
+5. Tạo cấu trúc thư mục cho gói Debian:
+   mkdir -p autoplan-pkg/usr/bin
+   mkdir -p autoplan-pkg/DEBIAN
+   cp dist/autoplan autoplan-pkg/usr/bin/
+
+6. Tạo file thông tin gói (Control file):
+   printf "Package: autoplan\nVersion: 1.0.0\nSection: utils\nPriority: optional\nArchitecture: amd64\nMaintainer: Nguyen Duy Truong <skul9x@gmail.com>\nDescription: AutoPlan Python Automation Tool\n" > autoplan-pkg/DEBIAN/control
+
+7. Phân quyền cho file thực thi:
+   chmod +x autoplan-pkg/usr/bin/autoplan
+
+8. Đóng gói thành file .deb:
+   dpkg-deb --build autoplan-pkg
+
+9. Cài đặt file .deb vào hệ thống:
+   sudo dpkg -i autoplan-pkg.deb
+
+10. Cách chạy sau khi cài đặt:
+   Gõ lệnh "autoplan" trong terminal hoặc tìm trong menu ứng dụng.
+
+---
+Lưu ý: Nếu gặp lỗi thiếu thư viện khi cài đặt, hãy chạy:
+sudo apt-get install -f

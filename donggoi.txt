@@ -1,0 +1,18 @@
+HƯỚNG DẪN ĐÓNG GÓI FILE .EXE CHO WINDOWS
+=======================================
+
+1. Cài đặt thư viện PyInstaller:
+   Mở Terminal/CMD và chạy lệnh:
+   pip install pyinstaller
+
+2. Chạy lệnh đóng gói:
+   Sử dụng lệnh sau để tạo một file .exe duy nhất, có icon và không hiện cửa sổ console đen:
+   
+   pyinstaller --noconsole --onefile --name "AutoPlan" --icon="icon.png" main.py
+
+   *Lưu ý: 
+   - Nếu bạn muốn bao gồm cả file icon.png vào trong bộ cài, hãy thêm: --add-data "icon.png;."
+   - File kết quả sẽ nằm trong thư mục "dist/".
+
+3. Kiểm tra:
+   Vào thư mục dist/ và chạy file AutoPlan.exe.
