@@ -48,7 +48,7 @@ class BotCore:
         """
         print(f"Executing template sequence for: {file_path}")
         # Nhấn Ctrl + Shift + L
-        time.sleep(0.68)
+        time.sleep(1.5)
         pyautogui.hotkey('ctrl', 'shift', 'l')
         
         # Nghỉ 1.0 giây (giống trước để UI phản hồi)
@@ -57,9 +57,8 @@ class BotCore:
         # Format lại template prompt: thay thế chuỗi {xxx} bằng file_path
         formatted_prompt = template_prompt.replace("{xxx}", file_path)
         
-        # Sử dụng pyperclip để copy vào clipboard (ổn định hơn trên Linux)
-        import pyperclip
-        pyperclip.copy(formatted_prompt)
+        # Sử dụng cơ chế copy an toàn
+        self._safe_copy(formatted_prompt)
         
         # Nghỉ một chút trước khi dán để tránh xung đột trên Linux
         time.sleep(0.5)
@@ -82,3 +81,24 @@ class BotCore:
         pyautogui.write(command, interval=0.01)
         pyautogui.press('enter')
         time.sleep(0.5) # Chờ một chút sau khi nhấn Enter
+
+    def _safe_copy(self, text):
+        """
+        Copy text vào clipboard với cơ chế fallback từ pyperclip sang tkinter.
+        """
+        try:
+            import pyperclip
+            pyperclip.copy(text)
+            print("Copied to clipboard via pyperclip.")
+        except Exception as e:
+            print(f"Pyperclip failed ({e}), falling back to tkinter...")
+            try:
+                root = tk.Tk()
+                root.withdraw()
+                root.clipboard_clear()
+                root.clipboard_append(text)
+                root.update()
+                root.destroy()
+                print("Copied to clipboard via tkinter.")
+            except Exception as e2:
+                print(f"All clipboard mechanisms failed: {e2}")
