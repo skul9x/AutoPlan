@@ -10,7 +10,8 @@ DEFAULT_SETTINGS = {
     "mru_icon_link": "",
     "scan_region": None,
     "alarm_enabled": False,
-    "alarm_mp3_path": ""
+    "alarm_mp3_path": "",
+    "prompt_template": "hãy thực hiện code bám sát theo file {xxx}. chú ý, làm đúng yêu cầu, bảo gì làm đấy, không vẽ việc thêm. yêu cầu bạn phải test thật kĩ khi làm xong, ưu tiên test bằng file (nếu chưa có file test thì bạn phải tạo ra). nếu thấy quá khó thì hãy tra online để tìm cách làm đúng chuẩn nhằm sửa lỗi hoặc tiếp tục phát triển. lưu ý, không được mở trình duyệt rồi lấy dom trực tiếp, dùng search_web / read_url_content khi cần tra cứu"
 }
 
 def get_config_dir():

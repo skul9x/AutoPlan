@@ -10,7 +10,7 @@ class TestEngineDualScan(unittest.TestCase):
         self.finished_mock = MagicMock()
         self.engine = AutomationEngine(self.log_mock, self.finished_mock)
         # Mock the bot's input sequence to avoid actual keyboard actions
-        self.engine.bot.input_vietcode_sequence = MagicMock()
+        self.engine.bot.input_template_sequence = MagicMock()
 
     def test_start_signature_and_thread_init(self):
         """Test if start() accepts error_icon_path and passes it to the thread."""
@@ -63,7 +63,7 @@ class TestEngineDualScan(unittest.TestCase):
                 
                 mock_sleep.side_effect = stop_engine
 
-                self.engine._run_loop("/tmp", ["file1.md"], "normal.png", None, "error.png", False, "")
+                self.engine._run_loop("/tmp", ["file1.md"], "normal.png", None, "error.png", False, "", "")
 
         # Verify calls
         # Call 1: error.png (Found)
@@ -78,7 +78,7 @@ class TestEngineDualScan(unittest.TestCase):
         self.assertTrue(len(error_logs) > 0)
         
         # Check if input sequence was called (meaning it broke the loop correctly after normal icon)
-        self.engine.bot.input_vietcode_sequence.assert_called_once()
+        self.engine.bot.input_template_sequence.assert_called_once()
 
     def test_backward_compatibility_no_error_path(self):
         """Test that if error_icon_path is None, it works as before."""
@@ -90,12 +90,12 @@ class TestEngineDualScan(unittest.TestCase):
                 # But here it should break naturally on normal icon
                 self.engine.is_running = True
                 
-                # Mock input_vietcode_sequence to stop the loop
+                # Mock input_template_sequence to stop the loop
                 def stop_loop(*args):
                     self.engine.is_running = False
-                self.engine.bot.input_vietcode_sequence.side_effect = stop_loop
+                self.engine.bot.input_template_sequence.side_effect = stop_loop
                 
-                self.engine._run_loop("/tmp", ["file1.md"], "normal.png", None, None, False, "")
+                self.engine._run_loop("/tmp", ["file1.md"], "normal.png", None, None, False, "", "")
 
         # is_icon_visible should be called with normal.png
         self.engine.bot.is_icon_visible.assert_any_call("normal.png", region=None)

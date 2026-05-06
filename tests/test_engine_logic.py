@@ -43,7 +43,7 @@ class TestEngineLogic(unittest.TestCase):
         self.engine.is_running = True
         
         # Execute the loop (normally this runs in a thread, but we call _run_loop directly for testing)
-        self.engine._run_loop(folder_path, md_files, icon_path)
+        self.engine._run_loop(folder_path, md_files, icon_path, None, None, False, "", "")
         
         # Verify sequence of calls
         # Wait for icon visible: called twice (False, True)
@@ -52,7 +52,7 @@ class TestEngineLogic(unittest.TestCase):
         self.assertEqual(self.engine.bot.is_icon_visible.call_count, 4)
         
         abs_path = os.path.join(folder_path, "file1.md")
-        self.engine.bot.input_vietcode_sequence.assert_called_once_with(abs_path)
+        self.engine.bot.input_template_sequence.assert_called_once_with(abs_path, "")
         
         # Verify logs
         self.log_mock.assert_any_call("Đang chờ icon hiển thị để xử lý: file1.md")
@@ -69,7 +69,7 @@ class TestEngineLogic(unittest.TestCase):
         # Simulate stopping the engine after 2 checks
         # We use a wrapper function for side_effect to track calls
         self.call_count = 0
-        def side_effect(path):
+        def side_effect(path, **kwargs):
             self.call_count += 1
             if self.call_count >= 2:
                 self.engine.is_running = False
@@ -77,10 +77,10 @@ class TestEngineLogic(unittest.TestCase):
         
         self.engine.bot.is_icon_visible.side_effect = side_effect
         
-        self.engine._run_loop("/path", md_files, "icon.png")
+        self.engine._run_loop("/path", md_files, "icon.png", None, None, False, "", "")
         
         # Should have broken out of the loop
-        self.engine.bot.input_vietcode_sequence.assert_not_called()
+        self.engine.bot.input_template_sequence.assert_not_called()
         self.log_mock.assert_any_call("Bot đã dừng lại.")
 
 if __name__ == '__main__':

@@ -13,7 +13,7 @@ class AppUI:
     def __init__(self, root):
         self.root = root
         self.root.title("AutoPlan Runner - Python Edition")
-        self.root.geometry("650x750")
+        self.root.geometry("650x850")
         self.root.configure(bg="#f0f0f0")
         
         
@@ -111,9 +111,22 @@ class AppUI:
         
         ttk.Button(alarm_frame, text="Browse MP3", command=self.browse_mp3).grid(row=1, column=2, padx=5)
 
+        # Prompt Template Settings
+        template_frame = ttk.LabelFrame(self.main_frame, text="Prompt Template", padding=10)
+        template_frame.grid(row=7, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=10)
+        
+        self.prompt_text = scrolledtext.ScrolledText(
+            template_frame,
+            height=5,
+            wrap=tk.WORD,
+            font=("Consolas", 10)
+        )
+        self.prompt_text.pack(fill=tk.BOTH, expand=True)
+        self.prompt_text.bind("<<Modified>>", lambda e: self._on_prompt_modified(e))
+
         # Control Buttons
         self.btn_frame = ttk.Frame(self.main_frame)
-        self.btn_frame.grid(row=7, column=0, columnspan=3, pady=10)
+        self.btn_frame.grid(row=8, column=0, columnspan=3, pady=10)
         
         self.start_btn = ttk.Button(
             self.btn_frame, 
@@ -131,7 +144,7 @@ class AppUI:
         self.stop_btn.pack(side=tk.LEFT, padx=10)
         
         # Log Area
-        ttk.Label(self.main_frame, text="Log Output:").grid(row=8, column=0, sticky=tk.W)
+        ttk.Label(self.main_frame, text="Log Output:").grid(row=9, column=0, sticky=tk.W)
         self.log_area = scrolledtext.ScrolledText(
             self.main_frame, 
             height=15, 
@@ -140,18 +153,23 @@ class AppUI:
             fg="#00ff00", # Matrix green
             font=("Consolas", 10)
         )
-        self.log_area.grid(row=9, column=0, columnspan=3, sticky=(tk.W, tk.E, tk.N, tk.S), pady=5)
+        self.log_area.grid(row=10, column=0, columnspan=3, sticky=(tk.W, tk.E, tk.N, tk.S), pady=5)
         self.log_area.tag_config("error", foreground="red")
-        self.main_frame.rowconfigure(9, weight=1)
+        self.main_frame.rowconfigure(10, weight=1)
         self.main_frame.columnconfigure(1, weight=1)
 
         # Load and Apply Settings
         self.load_and_apply_settings()
 
         # Center window on screen
-        self.center_window(650, 750)
+        self.center_window(650, 850)
 
-    def center_window(self, width=650, height=750):
+    def _on_prompt_modified(self, event):
+        if self.prompt_text.edit_modified():
+            self.save_current_settings()
+            self.prompt_text.edit_modified(False)
+
+    def center_window(self, width=650, height=850):
         """Center the window on screen."""
         self.root.update_idletasks()  # Ensure geometry is calculated
         screen_width = self.root.winfo_screenwidth()
@@ -199,6 +217,11 @@ class AppUI:
             self.alarm_path_entry.delete(0, tk.END)
             self.alarm_path_entry.insert(0, alarm_mp3)
 
+        # 5. Prompt Template
+        prompt_template = settings.get("prompt_template", "")
+        self.prompt_text.delete("1.0", tk.END)
+        self.prompt_text.insert(tk.END, prompt_template)
+
     def validate_path(self, path):
         """Returns the path if valid on current OS, else empty string."""
         if not path:
@@ -220,7 +243,8 @@ class AppUI:
             "mru_icon_link": self.icon_path.get(),
             "scan_region": self.scan_region,
             "alarm_enabled": self.alarm_enabled.get(),
-            "alarm_mp3_path": self.alarm_path_entry.get()
+            "alarm_mp3_path": self.alarm_path_entry.get(),
+            "prompt_template": self.prompt_text.get("1.0", tk.END).strip()
         }
         try:
             settings_manager.save_settings(data)
@@ -372,7 +396,8 @@ class AppUI:
             region=self.scan_region,
             error_icon_path=error_icon if error_icon and os.path.exists(error_icon) else None,
             alarm_enabled=self.alarm_enabled.get(),
-            alarm_path=alarm_mp3 if alarm_mp3 and os.path.exists(alarm_mp3) else ""
+            alarm_path=alarm_mp3 if alarm_mp3 and os.path.exists(alarm_mp3) else "",
+            template_prompt=self.prompt_text.get("1.0", tk.END).strip()
         )
 
         # Log báo thức

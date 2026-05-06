@@ -19,14 +19,14 @@ class AutomationEngine:
         self.is_running = False
         self.on_finished_callback()
 
-    def start(self, folder_path, md_files, icon_path, region=None, error_icon_path=None, alarm_enabled=False, alarm_path=""):
+    def start(self, folder_path, md_files, icon_path, region=None, error_icon_path=None, alarm_enabled=False, alarm_path="", template_prompt=""):
         if self.is_running:
             return
         
         self.is_running = True
         self.thread = threading.Thread(
             target=self._run_loop, 
-            args=(folder_path, md_files, icon_path, region, error_icon_path, alarm_enabled, alarm_path),
+            args=(folder_path, md_files, icon_path, region, error_icon_path, alarm_enabled, alarm_path, template_prompt),
             daemon=True
         )
         self.thread.start()
@@ -36,7 +36,7 @@ class AutomationEngine:
         self.alarm.stop_alarm()
         self.log_callback("Dừng bot theo yêu cầu người dùng.")
 
-    def _run_loop(self, folder_path, md_files, icon_path, region, error_icon_path, alarm_enabled, alarm_path):
+    def _run_loop(self, folder_path, md_files, icon_path, region, error_icon_path, alarm_enabled, alarm_path, template_prompt):
         try:
             self.log_callback("Bot sẽ bắt đầu sau 2 giây. Vui lòng chuyển sang cửa sổ đích...")
             time.sleep(2)
@@ -71,7 +71,7 @@ class AutomationEngine:
                 self.log_callback(f"Icon đã xuất hiện! Thực thi sequence cho {file_name}...")
                 
                 # Bước 2: Thực thi chuỗi phím tắt
-                self.bot.input_vietcode_sequence(abs_path)
+                self.bot.input_template_sequence(abs_path, template_prompt)
                 
                 # Bước 3: Đợi icon biến mất để tránh trigger nhầm file cũ
                 # Hoặc có thể dùng một khoảng nghỉ ngắn tùy thuộc vào tốc độ phản hồi của IDE

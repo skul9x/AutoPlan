@@ -41,36 +41,31 @@ class BotCore:
             print(f"Error checking visibility: {e}")
             return False
 
-    def input_vietcode_sequence(self, file_path):
+    def input_template_sequence(self, file_path, template_prompt):
         """
-        Thực hiện chuỗi phím tắt và lệnh vietcode.
-        Sử dụng clipboard để dán đường dẫn file nhằm tăng tốc độ và tránh treo.
+        Thực hiện chuỗi phím tắt và dán nội dung template.
+        Sử dụng clipboard để dán chuỗi đã format nhằm tăng tốc độ và tránh treo.
         """
-        print(f"Executing vietcode sequence for: {file_path}")
+        print(f"Executing template sequence for: {file_path}")
         # Nhấn Ctrl + Shift + L
         time.sleep(0.68)
         pyautogui.hotkey('ctrl', 'shift', 'l')
         
-        # Gõ /vietcod
-        pyautogui.write('/vietcod', interval=0.01)
-        
-        # Nghỉ 1.0 giây
+        # Nghỉ 1.0 giây (giống trước để UI phản hồi)
         time.sleep(0.68)
         
-        # Nhấn Enter
-        pyautogui.press('enter')
+        # Format lại template prompt: thay thế chuỗi {xxx} bằng file_path
+        formatted_prompt = template_prompt.replace("{xxx}", file_path)
         
         # Sử dụng pyperclip để copy vào clipboard (ổn định hơn trên Linux)
         import pyperclip
-        pyperclip.copy(file_path)
+        pyperclip.copy(formatted_prompt)
         
         # Nghỉ một chút trước khi dán để tránh xung đột trên Linux
         time.sleep(0.5)
         
         # Nhấn Ctrl + V để dán
         pyautogui.hotkey('ctrl', 'v')
-
-
         
         # Nghỉ 0.5 giây để IDE xử lý lệnh dán
         time.sleep(0.5) 

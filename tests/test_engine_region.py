@@ -9,9 +9,10 @@ class TestEngineRegion(unittest.TestCase):
         self.finished_mock = MagicMock()
         self.engine = AutomationEngine(self.log_mock, self.finished_mock)
 
+    @patch('time.sleep')
     @patch('bot_core.BotCore.is_icon_visible')
-    @patch('bot_core.BotCore.input_vietcode_sequence')
-    def test_engine_passes_region(self, mock_sequence, mock_visible):
+    @patch('bot_core.BotCore.input_template_sequence')
+    def test_engine_passes_region(self, mock_sequence, mock_visible, mock_sleep):
         # Setup: icon found, then not found (to exit wait loop)
         mock_visible.side_effect = [True, False]
         
@@ -20,7 +21,7 @@ class TestEngineRegion(unittest.TestCase):
         
         # We need to run _run_loop directly to avoid threading for simple test
         self.engine.is_running = True
-        self.engine._run_loop("/fake/path", md_files, "icon.png", region=region)
+        self.engine._run_loop("/fake/path", md_files, "icon.png", region, None, False, "", "")
         
         # Verify visibility checks use region
         # First call: wait for icon

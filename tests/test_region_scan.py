@@ -12,9 +12,10 @@ class TestRegionScan(unittest.TestCase):
         self.engine = AutomationEngine(self.log_mock, self.finished_mock)
         self.bot = BotCore()
 
+    @patch('time.sleep')
     @patch('bot_core.BotCore.is_icon_visible')
-    @patch('bot_core.BotCore.input_vietcode_sequence')
-    def test_scenario_icon_outside_then_inside(self, mock_sequence, mock_visible):
+    @patch('bot_core.BotCore.input_template_sequence')
+    def test_scenario_icon_outside_then_inside(self, mock_sequence, mock_visible, mock_sleep):
         """
         Kịch bản: Chọn vùng A -> Để icon ở vùng B (invisible in A) -> Bot đợi -> Icon vào vùng A -> Bot chạy.
         """
@@ -30,7 +31,7 @@ class TestRegionScan(unittest.TestCase):
         
         self.engine.is_running = True
         # Chạy vòng lặp xử lý 1 file
-        self.engine._run_loop("/fake/path", md_files, "icon.png", region=region_a)
+        self.engine._run_loop("/fake/path", md_files, "icon.png", region_a, None, False, "", "")
         
         # Kiểm tra:
         # 1. is_icon_visible được gọi ít nhất 3 lần để đợi và nhận diện
@@ -40,8 +41,8 @@ class TestRegionScan(unittest.TestCase):
         for call in mock_visible.call_args_list:
             self.assertEqual(call[1].get('region'), region_a)
             
-        # 3. input_vietcode_sequence chỉ được gọi KHI icon xuất hiện (sau lần False, False, True)
-        mock_sequence.assert_called_once_with("/fake/path/test.md")
+        # 3. input_template_sequence chỉ được gọi KHI icon xuất hiện (sau lần False, False, True)
+        mock_sequence.assert_called_once_with("/fake/path/test.md", "")
         
         self.log_mock.assert_any_call("Đang chờ icon hiển thị trong vùng (100, 100, 200, 200) để xử lý: test.md")
 
@@ -65,7 +66,7 @@ class TestRegionScan(unittest.TestCase):
         
         root.destroy()
 
-    @patch('pyautogui.locateOnScreen')
+    @patch('bot_core.pyautogui.locateOnScreen')
     def test_invalid_region_handling(self, mock_locate):
         """Kiểm tra bot_core không crash với vùng chọn không hợp lệ (ví dụ quá nhỏ)."""
         mock_locate.return_value = None # PyAutoGUI thường trả về None nếu không tìm thấy hoặc lỗi vùng

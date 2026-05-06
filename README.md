@@ -6,10 +6,11 @@ AutoPlan là một ứng dụng mạnh mẽ dựa trên Python, được thiết
 
 - **Thực thi theo kế hoạch**: Tự động hóa các thao tác chuột và bàn phím dựa trên các bước được mô tả trong file Markdown.
 - **Nhận diện hình ảnh (OpenCV)**: Tìm kiếm chính xác các icon hoặc thành phần giao diện trên màn hình với độ tin cậy cao.
+- **Tùy chỉnh Prompt Template**: Hỗ trợ thiết lập mẫu câu lệnh động (sử dụng `{xxx}` làm biến đường dẫn), cho phép linh hoạt ra lệnh cho các AI khác nhau (như Cursor, Cline) thay vì hardcode.
 - **Hệ thống báo thức Stealth**: Tự động phát nhạc MP3 khi hoàn thành nhiệm vụ và hỗ trợ dừng nhanh bằng phím nóng (**F12**).
 - **Dừng khẩn cấp (Panic Stop)**: Sử dụng phím nóng (**F9**) để dừng ngay lập tức mọi hoạt động tự động hóa.
 - **Quản lý vùng quét**: Cho phép người dùng giới hạn khu vực tìm kiếm hình ảnh trên màn hình để tăng tốc độ và độ chính xác.
-- **Lưu trữ cấu hình**: Tự động ghi nhớ các thiết lập như đường dẫn thư mục, icon, vùng quét và cài đặt báo thức.
+- **Lưu trữ cấu hình**: Tự động ghi nhớ các thiết lập như đường dẫn thư mục, icon, vùng quét, mẫu prompt và cài đặt báo thức.
 
 ## 🛠️ Công nghệ sử dụng
 
