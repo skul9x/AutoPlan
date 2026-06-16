@@ -262,7 +262,10 @@ class AppUI:
         browse_btn.grid(row=row, column=2, padx=5, pady=5)
 
     def browse_folder(self):
-        folder = filedialog.askdirectory()
+        initial_dir = self.folder_path.get()
+        if not isinstance(initial_dir, str) or not os.path.exists(initial_dir):
+            initial_dir = "/home/skul9x/Desktop/Test_code/"
+        folder = filedialog.askdirectory(initialdir=initial_dir)
         if folder:
             self.folder_path.delete(0, tk.END)
             self.folder_path.insert(0, folder)

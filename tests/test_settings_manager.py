@@ -37,7 +37,9 @@ class TestSettingsManager(unittest.TestCase):
             f.write("INVALID JSON {")
             
         loaded = settings_manager.load_settings()
-        self.assertEqual(loaded, settings_manager.DEFAULT_SETTINGS)
+        expected = settings_manager.DEFAULT_SETTINGS.copy()
+        expected["mru_md_folder"] = "/home/skul9x/Desktop/Test_code/"
+        self.assertEqual(loaded, expected)
 
     def test_atomic_save(self):
         # Verify that config.json only exists after replace

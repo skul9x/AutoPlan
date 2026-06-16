@@ -12,6 +12,6 @@ settings = settings_manager.load_settings()
 
 print(f"prompt_template: {settings.get('prompt_template')}")
 
-assert settings.get('prompt_template') == "hãy thực hiện code bám sát theo file {xxx}. chú ý, làm đúng yêu cầu, bảo gì làm đấy, không vẽ việc thêm. yêu cầu bạn phải test thật kĩ khi làm xong, ưu tiên test bằng file (nếu chưa có file test thì bạn phải tạo ra). nếu thấy quá khó thì hãy tra online để tìm cách làm đúng chuẩn nhằm sửa lỗi hoặc tiếp tục phát triển. lưu ý, không được mở trình duyệt rồi lấy dom trực tiếp, dùng search_web / read_url_content khi cần tra cứu"
+assert settings.get('prompt_template') == "implement the code closely following the file {xxx}. note, follow the requirements exactly. do only what is asked, no extra work. once done, you must thoroughly test what you have just implemented, prioritizing testing with files (if no test file exists, you must create one). after finishing, mark the phase plan file as completed. if it seems too difficult, search online for the correct approach to fix errors or continue development. note, do not open a browser and directly access the dom. use search_web / read_url_content when you need to look something up. no need to explain anything. If you need to run a Python file, run it within a venv. when done, say \"done.\" to save token."
 
 print("Test passed!")

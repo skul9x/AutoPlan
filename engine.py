@@ -41,6 +41,7 @@ class AutomationEngine:
             self.log_callback("Bot sẽ bắt đầu sau 2 giây. Vui lòng chuyển sang cửa sổ đích...")
             time.sleep(2)
             
+            is_first_file = True
             for file_name in md_files:
                 if not self.is_running:
                     break
@@ -49,26 +50,30 @@ class AutomationEngine:
                 
                 region_info = f" trong vùng {region}" if region else ""
                 error_info = " (có kiểm tra ảnh lỗi)" if error_icon_path else ""
-                self.log_callback(f"Đang chờ icon hiển thị{region_info}{error_info} để xử lý: {file_name}")
                 
-                # Bước 1: Đợi icon với logic quét 2 ảnh
-                while self.is_running:
-                    # 1a. Nếu có ảnh lỗi → kiểm tra trước
-                    if error_icon_path and self.bot.is_icon_visible(error_icon_path, region=region):
-                        self.log_callback("⚠️ Phát hiện ảnh lỗi! Quét lại ngay...")
+                if is_first_file:
+                    self.log_callback(f"Lần đầu chạy: Bỏ qua quét màn hình, thực thi ngay cho: {file_name}")
+                else:
+                    self.log_callback(f"Đang chờ icon hiển thị{region_info}{error_info} để xử lý: {file_name}")
+                    
+                    # Bước 1: Đợi icon với logic quét 2 ảnh
+                    while self.is_running:
+                        # 1a. Nếu có ảnh lỗi → kiểm tra trước
+                        if error_icon_path and self.bot.is_icon_visible(error_icon_path, region=region):
+                            self.log_callback("⚠️ Phát hiện ảnh lỗi! Quét lại ngay...")
+                            time.sleep(0.1)
+                            continue  # Quay lại đầu vòng lặp, KHÔNG quét ảnh bình thường
+                        
+                        # 1b. Không thấy ảnh lỗi (hoặc không có ảnh lỗi) → quét ảnh bình thường
+                        if self.bot.is_icon_visible(icon_path, region=region):
+                            break  # Thoát vòng lặp → bắt đầu flow làm việc
+                        
                         time.sleep(0.1)
-                        continue  # Quay lại đầu vòng lặp, KHÔNG quét ảnh bình thường
-                    
-                    # 1b. Không thấy ảnh lỗi (hoặc không có ảnh lỗi) → quét ảnh bình thường
-                    if self.bot.is_icon_visible(icon_path, region=region):
-                        break  # Thoát vòng lặp → bắt đầu flow làm việc
-                    
-                    time.sleep(0.1)
                 
                 if not self.is_running:
                     break
                 
-                self.log_callback(f"Icon đã xuất hiện! Thực thi sequence cho {file_name}...")
+                self.log_callback(f"Thực thi sequence cho {file_name}...")
                 
                 # Bước 2: Thực thi chuỗi phím tắt
                 self.bot.input_template_sequence(abs_path, template_prompt)
@@ -84,6 +89,7 @@ class AutomationEngine:
                     time.sleep(1)
                 
                 self.log_callback(f"Đã xử lý xong {file_name}, sẵn sàng cho file tiếp theo.")
+                is_first_file = False
 
             if self.is_running:
                 self.log_callback("Hoàn thành xử lý tất cả các file.")
